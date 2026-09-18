@@ -1,0 +1,18 @@
+{
+  "name": "rootcause-ai-demo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "clean": "node -e \"require('fs').rmSync('.next', { recursive: true, force: true })\"",
+    "predev": "npm run clean",
+    "backend": "python3 -m uvicorn backend.app.main:app --reload --port 8000",
+    "dev": "NODE_OPTIONS=--no-experimental-webstorage node --no-experimental-webstorage ./node_modules/next/dist/bin/next dev",
+    "build": "NODE_OPTIONS=--no-experimental-webstorage node --no-experimental-webstorage ./node_modules/next/dist/bin/next build",
+    "start": "NODE_OPTIONS=--no-experimental-webstorage node --no-experimental-webstorage ./node_modules/next/dist/bin/next start"
+  },
+  "dependencies": {
+    "next": "15.3.1",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  }
+}
