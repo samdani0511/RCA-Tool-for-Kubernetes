@@ -202,21 +202,6 @@ export default function Home() {
     );
   };
 
-  const handleResetFailure = async () => {
-    try {
-      setBusy(true);
-      const r = await fetch(`${API}/reset`, { method: 'POST' });
-      if (!r.ok) throw new Error('reset failed');
-      const payload = await r.json();
-      setData(payload);
-      setNotice('Failure reset — system baseline restored');
-    } catch {
-      setNotice('Reset failed. Confirm the FastAPI backend is running on port 8000.');
-    } finally {
-      setBusy(false);
-    }
-  };
-
   const services = useMemo(
     () => Object.fromEntries((data.services ?? []).map((item) => [item.id, item])),
     [data.services],
@@ -310,14 +295,9 @@ export default function Home() {
                 <small>{failureMeta.note}</small>
               </div>
 
-              <div className="failure-actions">
-                <button type="button" className="secondary" onClick={handleResetFailure} disabled={busy}>
-                  {busy ? 'Resetting…' : 'Reset failure'}
-                </button>
-                <button type="button" className="primary" onClick={handleInjectFailure} disabled={busy}>
-                  {busy ? 'Injecting…' : 'Inject failure'}
-                </button>
-              </div>
+              <button type="button" className="primary" onClick={handleInjectFailure} disabled={busy}>
+                {busy ? 'Injecting…' : 'Inject failure'}
+              </button>
             </div>
           </section>
         </div>
