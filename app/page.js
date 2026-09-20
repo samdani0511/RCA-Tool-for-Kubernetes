@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-const API = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api';
+const API = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3002/api';
 const FAILURE_CHOICES = [
   ['payment_db', 'Payment DB failure'],
   ['payment_latency', 'Payment latency'],
@@ -118,7 +118,7 @@ export default function Home() {
   const [busy, setBusy] = useState(false);
   const [view, setView] = useState('overview');
   const [evidenceOpen, setEvidenceOpen] = useState(false);
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState('light');
 
   const currentPreset = useMemo(
     () => presets.find((preset) => preset.id === presetId) ?? presets[0],
@@ -161,8 +161,18 @@ export default function Home() {
   }, [load]);
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
+    if (typeof document !== 'undefined') {
+      document.documentElement.dataset.theme = theme;
+    }
   }, [theme]);
+
+  const handleToggleTheme = () => {
+    const nextTheme = 'light';
+    if (typeof document !== 'undefined') {
+      document.documentElement.dataset.theme = nextTheme;
+    }
+    setTheme(nextTheme);
+  };
 
   const mutate = async (body, message) => {
     setBusy(true);
@@ -202,6 +212,22 @@ export default function Home() {
     );
   };
 
+  const handleResetFailure = async () => {
+    setBusy(true);
+    try {
+      const r = await fetch(`${API}/reset`, { method: 'POST' });
+      if (!r.ok) throw new Error('reset failed');
+      const payload = await r.json();
+      setData(payload);
+      setScenario('payment_db');
+      setNotice('Reset active failure and restored the healthy baseline');
+    } catch {
+      setNotice('Reset failed. Confirm the FastAPI backend is running on port 8000.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const services = useMemo(
     () => Object.fromEntries((data.services ?? []).map((item) => [item.id, item])),
     [data.services],
@@ -238,8 +264,8 @@ export default function Home() {
           </div>
           <div className="top-actions">
             <span className="monitor"><i /> Monitoring {data.services.length} services</span>
-            <button className="theme-toggle" type="button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label="Toggle light and dark mode">
-              {theme === 'dark' ? '☀ Light mode' : '◐ Dark mode'}
+            <button className="theme-toggle" type="button" onClick={handleToggleTheme} aria-label="Light mode" disabled>
+              Light mode
             </button>
           </div>
         </header>
@@ -295,9 +321,14 @@ export default function Home() {
                 <small>{failureMeta.note}</small>
               </div>
 
-              <button type="button" className="primary" onClick={handleInjectFailure} disabled={busy}>
-                {busy ? 'Injecting…' : 'Inject failure'}
-              </button>
+              <div className="failure-actions">
+                <button type="button" className="secondary" onClick={handleResetFailure} disabled={busy}>
+                  {busy ? 'Resetting…' : 'Reset failure'}
+                </button>
+                <button type="button" className="primary" onClick={handleInjectFailure} disabled={busy}>
+                  {busy ? 'Injecting…' : 'Inject failure'}
+                </button>
+              </div>
             </div>
           </section>
         </div>

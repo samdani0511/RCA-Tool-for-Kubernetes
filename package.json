@@ -5,10 +5,10 @@
   "scripts": {
     "clean": "node -e \"require('fs').rmSync('.next', { recursive: true, force: true })\"",
     "predev": "npm run clean",
-    "backend": "python3 -m uvicorn backend.app.main:app --reload --port 8000",
-    "dev": "NODE_OPTIONS=--no-experimental-webstorage node --no-experimental-webstorage ./node_modules/next/dist/bin/next dev",
-    "build": "NODE_OPTIONS=--no-experimental-webstorage node --no-experimental-webstorage ./node_modules/next/dist/bin/next build",
-    "start": "NODE_OPTIONS=--no-experimental-webstorage node --no-experimental-webstorage ./node_modules/next/dist/bin/next start"
+    "backend": "python3 -m uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 3002",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
   },
   "dependencies": {
     "next": "15.3.1",
